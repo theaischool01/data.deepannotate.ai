@@ -26,6 +26,7 @@ export interface UserProfile {
   ifsc_code: string | null;
   country: string | null;
   current_status: string | null;
+  two_factor_enabled?: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;

@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
     // 1. Check if user already exists by firebase_uid
     const { data: existingByUid, error: uidErr } = await admin
       .from("profiles")
-      .select("id, email, onboarding_complete, profile_completed, display_name")
+      .select("id, email, onboarding_complete, profile_completed, display_name, two_factor_enabled")
       .eq("firebase_uid", firebaseUid)
       .maybeSingle();
 
@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
       // 2. Map existing user by email to prevent duplicate accounts
       const { data: existingByEmail, error: emailErr } = await admin
         .from("profiles")
-        .select("id, email, onboarding_complete, profile_completed, display_name")
+        .select("id, email, onboarding_complete, profile_completed, display_name, two_factor_enabled")
         .eq("email", email)
         .maybeSingle();
 
@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
           .from("profiles")
           .update({ firebase_uid: firebaseUid } as any)
           .eq("id", existingByEmail.id)
-          .select("id, email, onboarding_complete, profile_completed, display_name")
+          .select("id, email, onboarding_complete, profile_completed, display_name, two_factor_enabled")
           .single();
 
         if (updateErr) {
@@ -148,7 +148,7 @@ Deno.serve(async (req) => {
           onboarding_complete: false,
           profile_completed: false,
         } as any)
-        .select("id, email, onboarding_complete, profile_completed, display_name")
+        .select("id, email, onboarding_complete, profile_completed, display_name, two_factor_enabled")
         .single();
 
       if (insertErr) {

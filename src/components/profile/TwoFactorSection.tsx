@@ -5,6 +5,7 @@ import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -20,7 +21,28 @@ import { toast } from "sonner";
 
 export default function TwoFactorSection() {
   const { profile, fetchProfile } = useAuthStore();
+  const [statusLoading, setStatusLoading] = useState(true);
   const isEnabled = Boolean((profile as any)?.two_factor_enabled);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadStatus = async () => {
+      if (profile?.id) {
+        try {
+          await fetchProfile(profile.id);
+        } catch (err) {
+          console.warn("[2FA] Failed to refresh profile status on mount:", err);
+        }
+      }
+      if (isMounted) {
+        setStatusLoading(false);
+      }
+    };
+    loadStatus();
+    return () => {
+      isMounted = false;
+    };
+  }, [profile?.id, fetchProfile]);
 
   // Setup state
   const [step, setStep] = useState<"idle" | "qr" | "backup">("idle");
@@ -169,10 +191,13 @@ export default function TwoFactorSection() {
     }
   };
 
-  const handleFinishBackup = () => {
+  const handleFinishBackup = async () => {
     if (!savedBackupAck) {
       toast.error("Please confirm you have saved your backup codes.");
       return;
+    }
+    if (profile?.id) {
+      await fetchProfile(profile.id);
     }
     setStep("idle");
     setSecret(null);
@@ -247,6 +272,25 @@ export default function TwoFactorSection() {
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  if (statusLoading) {
+    return (
+      <Card className="bg-white border border-[#E5E7EB] shadow-none">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-11 w-11 rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-48" />
+              <Skeleton className="h-4 w-72" />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-10 w-36 rounded-lg" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-white border border-[#E5E7EB] shadow-none">

@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
     // Fetch profile fresh from DB
     const { data: profile, error: profileErr } = await admin
       .from("profiles")
-      .select("id, email, onboarding_complete, profile_completed, display_name")
+      .select("id, email, onboarding_complete, profile_completed, display_name, two_factor_enabled")
       .eq("id", profileId)
       .single();
 
