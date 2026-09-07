@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import NotificationBell from '@/components/app/NotificationBell';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { getFirstName } from '@/lib/displayName';
 import {
   LayoutGrid,
@@ -133,7 +134,9 @@ export function ContributorLayout() {
 
         {/* Page Content */}
         <main className="flex-1 overflow-x-hidden p-4 sm:p-6 pb-24 lg:pb-6 bg-[#F7F9FA]">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
 
         {/* Mobile Bottom Nav */}

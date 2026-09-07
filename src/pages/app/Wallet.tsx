@@ -66,6 +66,7 @@ export default function WalletPage() {
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
   const fetchProfile = useAuthStore((s) => s.fetchProfile);
+  const userId = profile?.id;
   const navigate = useNavigate();
   const [earnings, setEarnings] = useState<EarningRow[]>([]);
   const [withdrawals, setWithdrawals] = useState<WithdrawRow[]>([]);
@@ -190,7 +191,7 @@ export default function WalletPage() {
 
   useEffect(() => {
     fetchData();
-  }, [user]);
+  }, [user, userId]);
 
   // Derived stats — ONLY from approved earnings
   const approvedEarnings = earnings.filter((e) => e.status === 'approved' || e.status === 'paid');

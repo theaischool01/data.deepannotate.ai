@@ -46,6 +46,7 @@ import AdminSupport from "./pages/admin/Support";
 import AdminSettings from "./pages/admin/Settings";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import TwoFactorGate from "./components/auth/TwoFactorGate";
+import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -92,69 +93,71 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthInitializer>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth/login" element={<Login />} />
-              <Route path="/auth/signup" element={<SignUp />} />
-              <Route path="/auth/verify-email" element={<VerifyEmail />} />
-              <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/auth/reset-password" element={<ResetPassword />} />
-              <Route path="/auth/update-password" element={<ResetPassword />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="/unauthorized" element={<Unauthorized />} />
-              <Route path="/complete-profile" element={<CompleteProfile />} />
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth/login" element={<Login />} />
+                <Route path="/auth/signup" element={<SignUp />} />
+                <Route path="/auth/verify-email" element={<VerifyEmail />} />
+                <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
+                <Route path="/auth/update-password" element={<ResetPassword />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="/complete-profile" element={<CompleteProfile />} />
 
-            {/* Admin routes */}
-            <Route
-              path="/admin"
-              element={
-                <RoleGuard allowedRoles={['admin']}>
-                  <AdminLayout />
-                </RoleGuard>
-              }
-            >
-              <Route index element={<AdminDashboard />} />
-              <Route path="tasks" element={<AdminTasks />} />
-              <Route path="create-task" element={<CreateTask />} />
-              <Route path="review" element={<AdminReview />} />
-              <Route path="review/:taskId" element={<ReviewTask />} />
-              <Route path="contributors" element={<AdminContributors />} />
-              <Route path="contributors/:userId" element={<ContributorDetail />} />
-              <Route path="communications" element={<Communications />} />
-              <Route path="analytics" element={<AdminAnalytics />} />
-              <Route path="payments" element={<Payments />} />
-              <Route path="payouts" element={<AdminPayouts />} />
-              <Route path="withdrawals" element={<WithdrawRequests />} />
-              <Route path="support" element={<AdminSupport />} />
-              <Route path="settings" element={<AdminSettings />} />
-            </Route>
+              {/* Admin routes */}
+              <Route
+                path="/admin"
+                element={
+                  <RoleGuard allowedRoles={['admin']}>
+                    <AdminLayout />
+                  </RoleGuard>
+                }
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="tasks" element={<AdminTasks />} />
+                <Route path="create-task" element={<CreateTask />} />
+                <Route path="review" element={<AdminReview />} />
+                <Route path="review/:taskId" element={<ReviewTask />} />
+                <Route path="contributors" element={<AdminContributors />} />
+                <Route path="contributors/:userId" element={<ContributorDetail />} />
+                <Route path="communications" element={<Communications />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="payments" element={<Payments />} />
+                <Route path="payouts" element={<AdminPayouts />} />
+                <Route path="withdrawals" element={<WithdrawRequests />} />
+                <Route path="support" element={<AdminSupport />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
 
-            {/* Contributor routes */}
-            <Route
-              path="/app"
-              element={
-                <RoleGuard allowedRoles={['contributor']}>
-                  <ContributorLayout />
-                </RoleGuard>
-              }
-            >
-              {/* Redirect /app to /app/tasks */}
-              <Route index element={<Navigate to="/app/tasks" replace />} />
-              <Route path="guidelines/:slug" element={<GuidelinesDetail />} />
-              <Route path="tasks" element={<TaskFeed />} />
-              <Route path="task/:taskId" element={<TaskExecution />} />
-              <Route path="task/:taskId/guidelines" element={<GuidelinesDetail />} />
-              <Route path="task/:taskId/instructions" element={<TaskInstructions />} />
-              <Route path="task/:taskId/submit" element={<SubmitTask />} />
-              <Route path="task/:taskId/annotate" element={<AnnotateTask />} />
-              <Route path="submissions" element={<MySubmissions />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="wallet" element={<WalletPage />} />
-            </Route>
+              {/* Contributor routes */}
+              <Route
+                path="/app"
+                element={
+                  <RoleGuard allowedRoles={['contributor']}>
+                    <ContributorLayout />
+                  </RoleGuard>
+                }
+              >
+                {/* Redirect /app to /app/tasks */}
+                <Route index element={<Navigate to="/app/tasks" replace />} />
+                <Route path="guidelines/:slug" element={<GuidelinesDetail />} />
+                <Route path="tasks" element={<TaskFeed />} />
+                <Route path="task/:taskId" element={<TaskExecution />} />
+                <Route path="task/:taskId/guidelines" element={<GuidelinesDetail />} />
+                <Route path="task/:taskId/instructions" element={<TaskInstructions />} />
+                <Route path="task/:taskId/submit" element={<SubmitTask />} />
+                <Route path="task/:taskId/annotate" element={<AnnotateTask />} />
+                <Route path="submissions" element={<MySubmissions />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="wallet" element={<WalletPage />} />
+              </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </ErrorBoundary>
         </AuthInitializer>
       </BrowserRouter>
     </TooltipProvider>

@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import {
   LayoutDashboard,
   ListTodo,
@@ -90,7 +91,9 @@ export function AdminLayout() {
           <span className="ml-2 font-display text-base font-bold text-[#0A1628]">data.deepannotate.ai</span>
         </header>
         <div className="flex-1 overflow-auto p-6 bg-[#F7F9FA]">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </div>
       </main>
     </div>

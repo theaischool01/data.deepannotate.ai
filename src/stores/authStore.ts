@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { supabase, setSupabaseToken } from "@/integrations/supabase/client";
+import { supabase, setSupabaseToken, getStoredSupabaseToken, isJwtValid, parseJwtPayload } from "@/integrations/supabase/client";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -87,11 +87,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set({ user: fbUser, loading: true });
 
+      // 1. Check if an active, unexpired session JWT is already stored in localStorage
+      const storedToken = getStoredSupabaseToken();
+      if (storedToken && isJwtValid(storedToken)) {
+        const payload = parseJwtPayload(storedToken);
+        if (payload?.sub) {
+          setSupabaseToken(storedToken);
+          try {
+            const [profRes, roleRes] = await Promise.all([
+              supabase.from("profiles").select("*").eq("id", payload.sub).single(),
+              supabase.from("user_roles").select("role").eq("user_id", payload.sub).maybeSingle(),
+            ]);
+
+            if (profRes.data) {
+              set({
+                profile: profRes.data as unknown as UserProfile,
+                role: (roleRes.data?.role || payload.app_role || "contributor") as AppRole,
+                twoFactorPending: false,
+                pendingToken: null,
+                loading: false,
+                initialized: true,
+              });
+              return;
+            }
+          } catch (restoreErr) {
+            console.warn("⚠️ Failed to restore profile with stored session token, falling back to full authentication:", restoreErr);
+          }
+        }
+      }
+
+      // 2. If no valid stored session JWT, call server-side firebase-auth Edge Function (enforces 2FA if enabled)
       try {
-        // Obtain Firebase ID token (works for email/password and Google users)
         const idToken = await fbUser.getIdToken();
 
-        // Call the server-side firebase-auth Edge Function (THE ONLY JWT ISSUER)
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
