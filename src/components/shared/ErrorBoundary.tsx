@@ -42,6 +42,11 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
+      const isChunkError =
+        this.state.error?.message?.includes('Failed to fetch dynamically imported module') ||
+        this.state.error?.message?.includes('Importing a module script failed') ||
+        this.state.error?.message?.includes('error loading dynamically imported module');
+
       return (
         <div className="min-h-[400px] flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950">
           <Card className="max-w-md w-full shadow-lg border border-red-200 dark:border-red-900/40">
@@ -51,10 +56,12 @@ export class ErrorBoundary extends Component<Props, State> {
               </div>
               <div className="space-y-1">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                  Something went wrong
+                  {isChunkError ? 'New App Version Available' : 'Something went wrong'}
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  An unhandled error occurred while rendering this view.
+                  {isChunkError
+                    ? 'A new version of the app has been deployed. Please reload to load the latest code.'
+                    : 'An unhandled error occurred while rendering this view.'}
                 </p>
               </div>
 
